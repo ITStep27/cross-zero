@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #runner {
+            width: 60px;
+            height: 60px;
+            border: none;
+            outline: none;
+            background-color: orange;
+            border-radius: 50%;
+            position: absolute;
+            top: calc(50% - 30px);
+            left: calc(50% - 30px);
+        }
+    </style>
+</head>
+<body>
+    <div id="log">    </div>
+
+    <button id="runner"> </div>
+
+    <script>
+        const log = document.querySelector('#log');
+        const runner = document.querySelector('#runner');
+
+        const getDistance = (x1, y1, x2, y2) => Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
+
+        window.addEventListener('mousemove', function(event){
+            const {pageX, pageY} = event;
+            let {left, top, width, height} = getComputedStyle(runner);
+
+            left = parseInt(left) + parseInt(width) / 2;
+            top = parseInt(top) + parseInt(height) / 2;
+            const dist = getDistance(pageX, pageY, left, top);
+
+            if (left < parseInt(width) + 5) left = parseInt(width) + 5;
+            if (top < parseInt(height) + 5) top = parseInt(height) + 5;
+            if (left + parseInt(width) > window.innerWidth - 5) left = window.innerWidth - parseInt(width) - 5;
+            if (top + parseInt(height) > window.innerHeight - 5) top = window.innerHeight - parseInt(height) - 5;
+
+            if (dist < parseInt(width)) {
+                const deltaX = left - pageX;
+                const deltaY = top - pageY;
+                runner.style.left = left + deltaX / 3 - parseInt(width) / 2 + 'px';
+                runner.style.top = top + deltaY / 3 - parseInt(height) / 2 + 'px';
+            };
+        });
+    </script>
+</body>
+</html>

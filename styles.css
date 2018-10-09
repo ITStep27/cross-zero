@@ -1,0 +1,65 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    font-family: sans-serif;
+}
+.cell {
+    width: 50px;
+    height: 50px;
+    background-color: #fff;
+    margin: 0px;
+    cursor: pointer;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+#cell1, #cell4, #cell7 {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+#cell3, #cell4, #cell5 {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+.screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 160px;
+    margin: 100px auto;
+}
+#btn {
+    background-color: rgba(20,20,20,.3);
+    color: red;
+    margin: 50px auto;
+    display: block;
+    outline: none;
+    border: none;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+h1 {
+    margin: 20px auto;
+    text-align: center;
+}
+h1#win {
+    margin-top: 100px;
+}
+h1 span {
+    margin: 5px;
+    display: inline-block;
+    background:no-repeat;
+    width: 52px;height: 52px;
+}
+span.win {
+    background-image: url('win.jpg'); 
+}
+span.loss {
+    background-image: url('loss.jpg'); 
+}
+span.standoff {
+    background-image: url('standoff.jpg'); 
+}
