@@ -1,4 +1,32 @@
-function matrixArray(rows, columns) {
+// глобальные пер-е
+
+const screen = document.querySelector(".screen");
+
+const text = document.querySelector("h1");
+
+let whoIsMove = 1; // 1 - player; 2 - comp;
+
+let field = matrixArray(3, 3);
+
+let level = 0; // уровень логики
+
+let cell = [];
+
+let levelList = {
+  text: ["Новичек", "Любитель", "Продвинутый", "Эксперт"],
+  path: ["beginner.png", "amateur.png", "advanced.png", "expert.png"]
+};
+
+let levels = document.querySelector("#levels");
+
+let levelBtn = [];
+
+let gameInProgress = false;
+
+let thinking = 0;
+// ----------------------------------------------------------------------------
+
+function matrixArray(rows, columns) { // создает матрицу
   let arr = new Array();
   for (var i = 0; i < rows; i++) {
     arr[i] = new Array();
@@ -9,18 +37,20 @@ function matrixArray(rows, columns) {
   return arr;
 }
 
-const getCell = n => {
+function getCell(n) { // возвр. значение матрицы по порядк. номеру
   let row = Math.floor(n / 3);
   let col = n % 3;
   return field[row][col];
 };
-const setCell = (n, val) => {
+
+function setCell (n, val) { // присв. значение матрицы по порядк. номеру
+  // если поле занято, не изменяет его, а возврашает false; в противном случае - true.
   let row = Math.floor(n / 3);
   let col = n % 3;
-  field[row][col] = val;
+  if (field[row][col] === null) {field[row][col] = val; return true;} else return false;
 };
-const isFieldFull = field => {
-  // проверка на ничью
+
+function isFieldFull (field) { // проверка на ничью
   let res = true;
   for (let i = 0; i < 3; i++) {
     for (j = 0; j < 3; j++) {
@@ -30,22 +60,19 @@ const isFieldFull = field => {
       }
     }
   }
-
   return res;
 };
-const compare = field => {
-  // сравнение массивов
+
+function compare (field) {  // сравнение массивов
 
   for (let x = 0; x < 8; x++) {
     if (arrayCompare(getChain(x), [1, 1, 1])) return 1;
     if (arrayCompare(getChain(x), [0, 0, 0])) return 0;
   }
-
   return null;
 };
 
-function getChain(type) {
-  // возвращает строку : 0-2 горизонталь, 3-5 вертикаль, 6-7 диагональ.
+function getChain(type) { // возвращает строку : 0-2 горизонталь, 3-5 вертикаль, 6-7 диагональ.
   let arr = [];
   if (type < 3) return field[type];
 
@@ -72,16 +99,15 @@ function getChain(type) {
     return arr;
   }
 }
-
+//------------------------------------------
 function arrayCompare(a1, a2) {
   for (let n = 0; n < 3; n++) if (a1[n] != a2[n]) return false;
   return true;
 }
 
-function getMove() {
-  // возвращает ход компьютера
+function getMove() { // возвращает ход компьютера
   let j;
-  chance = Math.round(Math.random() * 2 * 10) / 10; // число от 0.0 до 1.99
+  chance = Math.random() * 2; // число от 0.0 до 1.99
   if (chance < level) {
     // ставим третий в ряду нолик (побеждаем)
     // горизонталь
@@ -108,7 +134,7 @@ function getMove() {
     if (arrayCompare(getChain(7), [0, 0, null])) return { j: 0, i: 2 };
     if (arrayCompare(getChain(7), [0, null, 0])) return { j: 1, i: 1 };
   }
-  chance = Math.round(Math.random() * 2 * 10) / 10; // число от 0.0 до 1.99
+  chance = Math.random() * 2; // число от 0.0 до 1.99
   if (chance < level) {
     // блокируем третий в ряду крестик
     // вертикаль
@@ -135,40 +161,53 @@ function getMove() {
     if (arrayCompare(getChain(7), [1, 1, null])) return { j: 0, i: 2 };
     if (arrayCompare(getChain(7), [1, null, 1])) return { j: 1, i: 1 };
   }
-  chance = Math.round(Math.random() * 2 * 10) / 10; // число от 0.0 до 1.99
+  
+  chance = Math.random() * 3; // число от 0.0 до 2.99
   if (chance < level) {
     if (field[1][1] === null) return { j: 1, i: 1 }; // занимаем центр поля
   }
-  if (field[1][1] == 0) {
-    // если центр наш -
-    chance = Math.round(Math.random() * 3 * 10) / 10; // число от 0.0 до 2.99
+
+  chance = Math.random() * 3; // число от 0.0 до 2.9
+  // занимаем свободную горизонталь или вертикаль, если занят центр
+  console.log(getChain(1));
     if (chance < level) {
-      if (field[0][1] === null) return { j: 0, i: 1 }; // занимаем средние крайние ячейки поля
-      if (field[2][1] === null) return { j: 2, i: 1 };
-      if (field[1][0] === null) return { j: 1, i: 0 };
-      if (field[1][2] === null) return { j: 1, i: 2 };
+      let rnd = Math.floor(Math.random() * 2);
+      if (arrayCompare(getChain(1),[null,0,null])) return {j: 1, i: rnd * 2};
+      if (arrayCompare(getChain(4),[null,0,null])) return {j: rnd * 2, i: 1};
     }
-  } else {
-    chance = Math.round(Math.random() * 3 * 10) / 10; // число от 0.0 до 2.99
+
+    chance = Math.random() * 3; // число от 0.0 до 2.99
     if (chance < level) {
-      if (field[0][0] === null) return { j: 0, i: 0 }; // занимаем углы поля
-      if (field[0][2] === null) return { j: 0, i: 2 };
       if (field[2][0] === null) return { j: 2, i: 0 };
+      if (field[0][0] === null) return { j: 0, i: 0 }; // занимаем углы поля, если наш центр
+      if (field[0][2] === null) return { j: 0, i: 2 };
       if (field[2][2] === null) return { j: 2, i: 2 };
     }
-  }
+
+
+    chance = Math.random() * 3; // число от 0.0 до 2.99
+    if (chance < level) { // занимаем соседнюю с нашей диагональю клетку
+      if (field[0][0] == 1) {if (field[0][1] === null) return {j: 0, i: 1}} else if (field[1][0] === null) return {j:1, i:0};
+      if (field[0][2] == 1) {if (field[0][1] === null) return {j: 0, i: 1}} else if (field[1][2] === null) return {j:1, i:2};
+      if (field[2][0] == 1) {if (field[2][1] === null) return {j: 2, i: 1}} else if (field[1][0] === null) return {j:1, i:0};
+      if (field[2][2] == 1) {if (field[2][1] === null) return {j: 2, i: 1}} else if (field[1][2] === null) return {j:1, i:2};
+    }
 
   // рандомный ход
   let n = Math.floor(Math.random() * 9);
   while (getCell(n) !== null) n = Math.floor(Math.random() * 9);
   return { j: Math.floor(n / 3), i: n % 3 };
 }
+// -------------------------------------------------------------------------
 
-const element = (j, i) => cell[j * 3 + i];
-
-const clickHandler = e => {
-  if (whoIsMove == 0) return;
+function element(j, i) { // возвр. знач. эл-та матрицы по порядковому номеру
+  return cell[j * 3 + i];
+}
+//=================================================================================
+function clickHandler (e) { // обработчик "ход игрока" (клик по игровому полю)
+  if (whoIsMove != 1 || e.target.classList[0] != "cell") return;
   newGameBtn(0);
+  gameInProgress = true;
   document.querySelector('#leveltext').style.visibility = 'hidden';
   let n = e.target.id.substr(4, 1);
   if (getCell(n) === null && whoIsMove == 1) {
@@ -176,12 +215,14 @@ const clickHandler = e => {
     setCell(n, 1);
     whoIsMove = 2;
     text.innerHTML = "Думаю......";
+    thinking = level * 20 + 40;
     // проверка победы игрока
     if (compare(field) == 1) {
       text.innerHTML = "Победа крестиков!";
       whoIsMove = 0;
-      document.querySelector('#leveltext').style.visibility = 'visible';
       newGameBtn(1);
+      gameInProgress = false;
+      document.querySelector('#leveltext').style.visibility = 'visible';
       document.querySelector("#win").innerHTML += `<span class="win"></span>`;
     }
   }
@@ -192,61 +233,37 @@ const clickHandler = e => {
     levels.style.opacity = 1;
     text.innerHTML = "Ничья !";
     newGameBtn(1);
+    gameInProgress = false;
     document.querySelector('#leveltext').style.visibility = 'visible';
     document.querySelector(
       "#win"
     ).innerHTML += `<span class="standoff"></span>`;
   }
 
-  if (whoIsMove == 2) {
-    // ходит комп
-    let time = setTimeout(function() {
-      whoIsMove = 1;
-      let move = getMove();
-      field[move.j][move.i] = 0;
-      element(move.j, move.i).style.backgroundImage = "url(o.png)";
-      // проверка победы компьютера
-      if (compare(field) == 0) {
-        text.innerHTML = "Победа ноликов!";
-        whoIsMove = 0;
-        newGameBtn(1);
-        document.querySelector('#leveltext').style.visibility = 'visible';
-        document.querySelector(
-          "#win"
-        ).innerHTML += `<span class="loss"></span>`;
-      }
-      if (compare(field) === null) text.innerHTML = "Ваш ход!";
-    }, 500);
-  }
-  let m;
-  if (whoIsMove == 0) {
-    for (m = 0; m < 4; m++)
-      document.querySelector(`#level${m}`).style.cursor = "pointer";
-  } else {
-    for (m = 0; m < 4; m++)
-      document.querySelector(`#level${m}`).style.cursor = "default";
-  }
+  if (whoIsMove == 2) thinking = level * 30 + 20; // ходит комп
+
+  choiceLevel();
 };
 
+
 function btnHandler(event) {
-  if (whoIsMove != 0) return;
-  if (btn.style.cursor != 'pointer') return;
-  newGameBtn(0);
-  let j, i, m;
-  for (j = 0; j < 3; j++)
-    for (i = 0; i < 3; i++) {
-      field[j][i] = null;
-      element(j, i).style.backgroundImage = "";
-      text.innerHTML = "Ваш ход!";
-      whoIsMove = 1;
-      for (m = 0; m < 4; m++)
-        document.querySelector(`#level${m}`).style.cursor = "pointer";
-    }
+  if (gameInProgress) return;
+  newGame();
 }
 
 function changeLevel() {
+  if (gameInProgress) return;
   for (let n = 0; n < 4; n++) {
     document.querySelector(`#level${n}`).style.opacity = n == level ? 1 : 0.5;
+    document.querySelector(`#level${n}`).style.cursor = n == level ? 'default' : 'pointer';
+    newGame();
+  }
+}
+
+function choiceLevel() {
+  let crs = gameInProgress ? 'default' : 'pointer';
+  for (let n = 0; n < 4; n++) {
+    document.querySelector(`#level${n}`).style.cursor = n == level ? 'default' : crs;
   }
 }
 
@@ -259,55 +276,80 @@ function newGameBtn(active) {
     btn.style.opacity = ".5";
   }
 }
+
 function levelsHandler(event) {
-  if (event.currentTarget.style.cursor != "pointer") return;
+  if (gameInProgress) return;
+  if (level == event.currentTarget.id.substr(5, 1)) return;
   level = event.currentTarget.id.substr(5, 1);
   win.innerHTML = '';
   changeLevel();
 }
 
-const screen = document.querySelector(".screen");
-const text = document.querySelector("h1");
 
-let whoIsMove = 1; // 1 - player; 2 - comp;
+function newGame(){
+  newGameBtn(0);
+  gameInProgress = false;
+  let j, i, m;
+  for (j = 0; j < 3; j++)
+    for (i = 0; i < 3; i++) {
+      field[j][i] = null;
+      element(j, i).style.backgroundImage = "";
+      text.innerHTML = "Ваш ход!";
+      whoIsMove = 1;
+    }
+}
 
-let field = matrixArray(3, 3);
+// старт игры
 
-let level = 0; // уровень логики
-
-let levelList = {
-  text: ["Новичек", "Любитель", "Продвинутый", "Непобедимый"],
-  path: ["beginner.jpg", "amateur.jpg", "advanced.jpg", "expert.jpg"]
-};
-
-let levels = document.querySelector("#levels");
-
-let n;
-let levelBtn = [];
-for (n = 0; n < 4; n++) {
+for (var n = 0; n < 4; n++) { // кнопки уровня сложности --------------------------
   levels.innerHTML += `<div id="level${n}"><img src="${
     levelList.path[n]
   }"><h2>${levelList.text[n]}</h2></div>`;
 }
-for (n = 0; n < 4; n++) {
+
+for (var n = 0; n < 4; n++) {
   levelBtn[n] = document.querySelector(`#level${n}`);
   levelBtn[n].addEventListener("click", levelsHandler);
-  levelBtn[n].style.cursor = "pointer";
 }
+//----------------------------------------------------------------------------------
 
-changeLevel();
-
-for (n = 0; n < 9; n++) {
+for (var n = 0; n < 9; n++) {
   screen.innerHTML += `<div class="cell"></div>`;
 }
 
-let cell = document.querySelectorAll(".cell");
+cell = document.querySelectorAll(".cell");
 
-for (let n = 0; n < 9; n++) {
+for (var n = 0; n < 9; n++) {
   cell[n].id = `cell${n}`;
 }
-
-newGameBtn(0);
+newGame();
+changeLevel();
 
 screen.addEventListener("click", clickHandler);
 btn.addEventListener("click", btnHandler);
+
+let interval = setInterval(function (){
+  if (thinking > 0) thinking--;
+  if (thinking == 0 && whoIsMove == 2)
+    {
+      // ходит комп
+        whoIsMove = 1;
+        let move = getMove();
+        field[move.j][move.i] = 0;
+        element(move.j, move.i).style.backgroundImage = "url(o.png)";
+        // проверка победы компьютера
+        if (compare(field) == 0) {
+          text.innerHTML = "Победа ноликов!";
+          whoIsMove = 0;
+          newGameBtn(1);
+          gameInProgress = false;
+          document.querySelector('#leveltext').style.visibility = 'visible';
+          document.querySelector(
+            "#win"
+          ).innerHTML += `<span class="loss"></span>`;
+        }
+        if (compare(field) === null) text.innerHTML = "Ваш ход!";
+        choiceLevel();
+      };
+
+}, 10);

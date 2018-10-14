@@ -58,13 +58,13 @@ h1 span {
     width: 52px;height: 52px;
 }
 span.win {
-    background-image: url('win.jpg'); 
+    background-image: url('win.png'); 
 }
 span.loss {
-    background-image: url('loss.jpg'); 
+    background-image: url('loss.png'); 
 }
 span.standoff {
-    background-image: url('standoff.jpg'); 
+    background-image: url('standoff.png'); 
 }
 h2 {
     margin: 10px auto;
