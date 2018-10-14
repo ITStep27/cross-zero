@@ -169,7 +169,6 @@ function getMove() { // возвращает ход компьютера
 
   chance = Math.random() * 3; // число от 0.0 до 2.9
   // занимаем свободную горизонталь или вертикаль, если занят центр
-  console.log(getChain(1));
     if (chance < level) {
       let rnd = Math.floor(Math.random() * 2);
       if (arrayCompare(getChain(1),[null,0,null])) return {j: 1, i: rnd * 2};
